@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-    implementation("ru.usb.pdf:pdfviewer:0.1.0")
+    implementation("com.github.karp4004.usbpdf:pdfviewer:0.1.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
