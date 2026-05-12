@@ -34,7 +34,7 @@ android {
 }
 
 group = "ru.usb.pdf"
-version = "0.1.0"
+version = "0.1.2"
 
 afterEvaluate {
     publishing {
@@ -44,7 +44,7 @@ afterEvaluate {
 
                 groupId = "ru.usb.pdf"
                 artifactId = "pdfviewer"
-                version = "0.1.0"
+                version = "0.1.2"
             }
         }
     }
