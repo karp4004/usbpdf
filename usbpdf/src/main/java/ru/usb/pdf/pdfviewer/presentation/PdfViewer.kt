@@ -1,5 +1,6 @@
 package ru.usb.pdf.pdfviewer.presentation
 
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -14,6 +15,44 @@ import ru.usb.pdf.pdfviewer.domain.PdfLink
 
 // PdfViewer.kt
 
+sealed interface PdfViewerLoadingState {
+    data object Loading : PdfViewerLoadingState
+    data class Ready(
+        val source: PdfSource,
+        val links: List<PdfLink>
+    ) : PdfViewerLoadingState
+
+    data class Error(val throwable: Throwable) : PdfViewerLoadingState
+}
+
+@Composable
+fun BoxScope.PdfViewer(
+    modifier: Modifier = Modifier,
+    state: PdfViewerLoadingState,
+    scrollMode: PdfScrollMode = PdfScrollMode.Vertical,
+    minScale: Float = 1f,
+    maxScale: Float = 4f,
+    onLinkClick: (PdfLink) -> Unit = {},
+    decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit,
+    loading: @Composable BoxScope.() -> Unit,
+    error: @Composable BoxScope.() -> Unit
+) {
+    when (state) {
+        is PdfViewerLoadingState.Loading -> loading()
+        is PdfViewerLoadingState.Error -> error()
+        is PdfViewerLoadingState.Ready -> PdfViewer(
+            modifier,
+            state.source,
+            state.links,
+            scrollMode,
+            minScale,
+            maxScale,
+            onLinkClick,
+            decorator
+        )
+    }
+}
+
 @Composable
 fun PdfViewer(
     modifier: Modifier = Modifier,
@@ -22,7 +61,8 @@ fun PdfViewer(
     scrollMode: PdfScrollMode = PdfScrollMode.Vertical,
     minScale: Float = 1f,
     maxScale: Float = 4f,
-    onLinkClick: (PdfLink) -> Unit = {}
+    onLinkClick: (PdfLink) -> Unit = {},
+    decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -65,7 +105,8 @@ fun PdfViewer(
             minScale = minScale,
             maxScale = maxScale,
             modifier = modifier,
-            onLinkClick = onLinkClick
+            onLinkClick = onLinkClick,
+            decorator = decorator
         )
     }
 }

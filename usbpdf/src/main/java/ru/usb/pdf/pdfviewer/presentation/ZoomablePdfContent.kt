@@ -3,21 +3,21 @@ package ru.usb.pdf.pdfviewer.presentation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -51,6 +50,7 @@ fun ZoomablePdfContent(
     maxScale: Float,
     linksByPage: Map<Int, List<PdfLink>>,
     onLinkClick: (PdfLink) -> Unit,
+    decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit
 ) {
     val zoomLevels = remember(minScale, maxScale) {
         listOf(
@@ -184,10 +184,21 @@ fun ZoomablePdfContent(
         activeLodScale = lodForScale(newScale)
     }
 
+    val lazyListState = rememberLazyListState()
+    val pagerState = rememberPagerState { pageCount }
+
+    val currentPage by remember(scrollMode) {
+        derivedStateOf {
+            when (scrollMode) {
+                PdfScrollMode.Vertical -> lazyListState.firstVisibleItemIndex
+                is PdfScrollMode.HorizontalPager -> pagerState.currentPage
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .safeDrawingPadding()
             .clipToBounds()
             .onSizeChanged { viewportSize = it }
             .pointerInput(scrollMode, viewportSize, contentSize) {
@@ -244,6 +255,7 @@ fun ZoomablePdfContent(
         when (scrollMode) {
             PdfScrollMode.Vertical -> {
                 LazyColumn(
+                    state = lazyListState,
                     modifier = zoomModifier,
                     contentPadding = PaddingValues(vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -261,22 +273,10 @@ fun ZoomablePdfContent(
                 }
             }
 
-            PdfScrollMode.HorizontalPager -> {
-                val pagerState = rememberPagerState {
-                    pageCount
-                }
-
-                val frameInsetHorizontal = 12.dp
-                val frameInsetVertical = 24.dp
-
+            is PdfScrollMode.HorizontalPager -> {
                 Box(
-                    modifier = Modifier
+                    modifier = scrollMode.modifier
                         .fillMaxSize()
-                        .padding(
-                            horizontal = frameInsetHorizontal,
-                            vertical = frameInsetVertical
-                        )
-                        .background(Color.White)
                         .clipToBounds()
                 ) {
                     HorizontalPager(
@@ -302,6 +302,10 @@ fun ZoomablePdfContent(
                     }
                 }
             }
+        }
+
+        if (pageCount > 0) {
+            decorator(currentPage, pageCount)
         }
     }
 }
