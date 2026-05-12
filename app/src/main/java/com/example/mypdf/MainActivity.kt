@@ -36,6 +36,7 @@ import kotlinx.coroutines.delay
 import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractor
 import ru.usb.pdf.pdfviewer.domain.PdfLoader
 import ru.usb.pdf.pdfviewer.domain.toViewerLinks
+import ru.usb.pdf.pdfviewer.presentation.ByteArrayPdfSource
 import ru.usb.pdf.pdfviewer.presentation.PdfScrollMode
 import ru.usb.pdf.pdfviewer.presentation.PdfViewer
 import ru.usb.pdf.pdfviewer.presentation.PdfViewerLoadingState
@@ -70,8 +71,7 @@ class MainActivity : ComponentActivity() {
 
             delay(2000)
 
-            state =
-                PdfViewerLoadingState.Error(Exception())//PdfViewerLoadingState.Ready(ByteArrayPdfSource(pdfBytes), links)
+            state = PdfViewerLoadingState.Ready(ByteArrayPdfSource(pdfBytes), links)
         }
 
 
