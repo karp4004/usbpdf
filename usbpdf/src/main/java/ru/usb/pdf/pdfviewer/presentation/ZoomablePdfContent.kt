@@ -187,7 +187,6 @@ fun ZoomablePdfContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.DarkGray)
             .safeDrawingPadding()
             .clipToBounds()
             .onSizeChanged { viewportSize = it }
