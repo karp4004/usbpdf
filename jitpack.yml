@@ -1,0 +1,6 @@
+# jitpack.yml
+jdk:
+  - openjdk17
+
+install:
+  - ./gradlew :usbpdf:publishReleasePublicationToMavenLocal
