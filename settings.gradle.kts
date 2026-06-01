@@ -26,3 +26,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "usbpdfviewer"
 include(":app")
+include(":usbpdf")
