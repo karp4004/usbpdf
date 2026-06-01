@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 PdfViewer(
                     state = state,
-                    scrollMode = PdfScrollMode.HorizontalPager(
+                    scrollMode = PdfScrollMode.VerticalPager(
                         Modifier
                             .padding(
                                 horizontal = 16.dp,
