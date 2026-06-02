@@ -63,3 +63,27 @@ class ByteArrayPdfSource(
             )
         }
 }
+
+class FilePdfSource(
+    private val path: String
+) : PdfSource {
+
+    override suspend fun open(context: Context): OpenedPdf =
+        withContext(Dispatchers.IO) {
+
+            val file = File(path)
+
+            require(file.exists()) {
+                "File does not exist: $path"
+            }
+
+            OpenedPdf(
+                file = file,
+                descriptor = ParcelFileDescriptor.open(
+                    file,
+                    ParcelFileDescriptor.MODE_READ_ONLY
+                ),
+                deleteOnClose = false
+            )
+        }
+}
