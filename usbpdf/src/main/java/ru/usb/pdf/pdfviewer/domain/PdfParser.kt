@@ -72,50 +72,50 @@ object PdfLoader {
 
 //📐 Правильное название системы координат
 //
-//Твоя текущая система — это:
+// Твоя текущая система — это:
 //
-//PDF User Space coordinates (default user space, untransformed)
+// PDF User Space coordinates (default user space, untransformed)
 //
-//Можно коротко:
+// Можно коротко:
 //
 //✅ Основной термин
-//PDF User Space
-//📌 Полное строгое определение
+// PDF User Space
+// 📌 Полное строгое определение
 //
-//Твои координаты:
+// Твои координаты:
 //
-//в единицах PDF (points, 1/72 inch)
-//origin = bottom-left
-//система страницы (Page coordinate system)
-//до применения:
-//CTM (Current Transformation Matrix)
-//rotation
-//viewport scaling
+// в единицах PDF (points, 1/72 inch)
+// origin = bottom-left
+// система страницы (Page coordinate system)
+// до применения:
+// CTM (Current Transformation Matrix)
+// rotation
+// viewport scaling
 //💡 Как это назвать в коде (рекомендую)
 //
-//Текущий вариант:
+// Текущий вариант:
 //
-//coordSystem = "PDF_CANONICAL"
+// coordSystem = "PDF_CANONICAL"
 //
-//Лучше заменить на:
+// Лучше заменить на:
 //
-//coordSystem = "PDF_USER_SPACE"
+// coordSystem = "PDF_USER_SPACE"
 //
-//или максимально явно:
+// или максимально явно:
 //
-//coordSystem = "PDF_PAGE_USER_SPACE"
+// coordSystem = "PDF_PAGE_USER_SPACE"
 //🚀 Как использовать это в будущем чате
 //
-//Ты можешь просто написать:
+// Ты можешь просто написать:
 //
-//"У меня координаты ссылок в PDF User Space (bottom-left origin, untransformed), как проецировать на Android Canvas?"
+// "У меня координаты ссылок в PDF User Space (bottom-left origin, untransformed), как проецировать на Android Canvas?"
 //
-//И я сразу пойму:
+// И я сразу пойму:
 //
-//✔ нужно инвертировать Y
-//✔ учитывать MediaBox
-//✔ применить scale
-//✔ учесть rotation
+// ✔ нужно инвертировать Y
+// ✔ учитывать MediaBox
+// ✔ применить scale
+// ✔ учесть rotation
 class PdfLinkExtractor {
 
     // =====================================================

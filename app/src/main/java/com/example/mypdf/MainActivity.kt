@@ -1,5 +1,6 @@
 package com.example.mypdf
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -36,10 +37,13 @@ import kotlinx.coroutines.delay
 import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractor
 import ru.usb.pdf.pdfviewer.domain.PdfLoader
 import ru.usb.pdf.pdfviewer.domain.toViewerLinks
-import ru.usb.pdf.pdfviewer.presentation.ByteArrayPdfSource
+import ru.usb.pdf.pdfviewer.presentation.FilePdfSource
 import ru.usb.pdf.pdfviewer.presentation.PdfScrollMode
 import ru.usb.pdf.pdfviewer.presentation.PdfViewer
 import ru.usb.pdf.pdfviewer.presentation.PdfViewerLoadingState
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 
 class MainActivity : ComponentActivity() {
 
@@ -57,9 +61,10 @@ class MainActivity : ComponentActivity() {
     fun PdfScreen() {
         var state by remember { mutableStateOf<PdfViewerLoadingState>(PdfViewerLoadingState.Loading) }
 
-        LaunchedEffect("dep_komfort_plus_230326_9xl8rxss.pdf") {
+        val uri = getOrCopyAssetToCache(this, "pdf_link_types_demo.pdf")
+        LaunchedEffect(uri) {
             val pdfBytes =
-                PdfLoader.loadFromAssets(this@MainActivity, "dep_komfort_plus_230326_9xl8rxss.pdf")
+                PdfLoader.loadFromAssets(this@MainActivity, "pdf_link_types_demo.pdf")
 
             val links = PdfLinkExtractor()
                 .extract(pdfBytes)
@@ -71,7 +76,7 @@ class MainActivity : ComponentActivity() {
 
             delay(2000)
 
-            state = PdfViewerLoadingState.Ready(ByteArrayPdfSource(pdfBytes), links)
+            state = PdfViewerLoadingState.Ready(FilePdfSource(uri), links)
         }
 
 
@@ -151,5 +156,48 @@ class MainActivity : ComponentActivity() {
                 )
             )
         }
+    }
+
+    @Throws(
+        FileNotFoundException::class,
+        IOException::class,
+        SecurityException::class
+    )
+    fun getOrCopyAssetToCache(
+        context: Context,
+        assetFileName: String
+    ): String {
+        require(assetFileName.isNotBlank()) {
+            "Asset file name is blank"
+        }
+
+        val outFile = File(context.cacheDir, assetFileName)
+
+        if (!outFile.exists()) {
+            try {
+                context.assets.open(assetFileName).use { input ->
+                    outFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            } catch (e: Exception) {
+                outFile.delete()
+                throw e
+            }
+        }
+
+        if (!outFile.exists()) {
+            throw FileNotFoundException(
+                "Failed to create cache file: ${outFile.absolutePath}"
+            )
+        }
+
+        if (!outFile.canRead()) {
+            throw SecurityException(
+                "Cache file is not readable: ${outFile.absolutePath}"
+            )
+        }
+
+        return outFile.absolutePath
     }
 }

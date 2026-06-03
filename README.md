@@ -136,3 +136,51 @@ If you have run out of energy or time for your project, put a note at the top of
 that development has slowed down or stopped completely. Someone may choose to fork your project or
 volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also
 make an explicit request for maintainers.
+
+📐 Правильное название системы координат
+
+Твоя текущая система — это:
+
+PDF User Space coordinates (default user space, untransformed)
+
+Можно коротко:
+
+✅ Основной термин
+PDF User Space
+📌 Полное строгое определение
+
+Твои координаты:
+
+в единицах PDF (points, 1/72 inch)
+origin = bottom-left
+система страницы (Page coordinate system)
+до применения:
+CTM (Current Transformation Matrix)
+rotation
+viewport scaling
+💡 Как это назвать в коде (рекомендую)
+
+Текущий вариант:
+
+coordSystem = "PDF_CANONICAL"
+
+Лучше заменить на:
+
+coordSystem = "PDF_USER_SPACE"
+
+или максимально явно:
+
+coordSystem = "PDF_PAGE_USER_SPACE"
+🚀 Как использовать это в будущем чате
+
+Ты можешь просто написать:
+
+"У меня координаты ссылок в PDF User Space (bottom-left origin, untransformed), как проецировать на
+Android Canvas?"
+
+И я сразу пойму:
+
+✔ нужно инвертировать Y
+✔ учитывать MediaBox
+✔ применить scale
+✔ учесть rotation
