@@ -19,8 +19,8 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     buildFeatures {
         compose = true
@@ -34,7 +34,7 @@ android {
 }
 
 group = "ru.usb.pdf"
-version = "1.0.3"
+version = "1.0.5"
 
 afterEvaluate {
     publishing {
@@ -44,7 +44,7 @@ afterEvaluate {
 
                 groupId = "ru.usb.pdf"
                 artifactId = "pdfviewer"
-                version = "1.0.3"
+                version = "1.0.5"
             }
         }
     }
