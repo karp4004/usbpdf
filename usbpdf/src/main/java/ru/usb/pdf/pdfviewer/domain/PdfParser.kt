@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ru.usb.pdf.pdfviewer.domain
 
 import android.content.Context

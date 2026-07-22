@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mypdf.ui.theme.MyPdfTheme
 import kotlinx.coroutines.delay
 import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractor
+import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractorAnnotate
 import ru.usb.pdf.pdfviewer.domain.PdfLoader
 import ru.usb.pdf.pdfviewer.domain.toViewerLinks
 import ru.usb.pdf.pdfviewer.presentation.FilePdfSource
@@ -61,14 +62,17 @@ class MainActivity : ComponentActivity() {
     fun PdfScreen() {
         var state by remember { mutableStateOf<PdfViewerLoadingState>(PdfViewerLoadingState.Loading) }
 
-        val uri = getOrCopyAssetToCache(this, "pdf_link_types_demo.pdf")
+        val uri = getOrCopyAssetToCache(this, "corrupt_links.pdf")
         LaunchedEffect(uri) {
             val pdfBytes =
-                PdfLoader.loadFromAssets(this@MainActivity, "pdf_link_types_demo.pdf")
+                PdfLoader.loadFromAssets(this@MainActivity, "corrupt_links.pdf")
 
             val links = PdfLinkExtractor()
                 .extract(pdfBytes)
-                .toViewerLinks()
+                .toViewerLinks() +
+                    PdfLinkExtractorAnnotate()
+                        .extract(pdfBytes)
+                        .toViewerLinks()
 
             links.forEach {
                 println("$it")
