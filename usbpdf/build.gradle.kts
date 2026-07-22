@@ -34,7 +34,7 @@ android {
 }
 
 group = "ru.usb.pdf"
-version = "1.0.6"
+version = "1.0.7"
 
 afterEvaluate {
     publishing {
