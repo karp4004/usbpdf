@@ -7,9 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,10 +35,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mypdf.ui.theme.MyPdfTheme
-import kotlinx.coroutines.delay
-import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractor
-import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractorAnnotate
 import ru.usb.pdf.pdfviewer.domain.PdfLoader
+import ru.usb.pdf.pdfviewer.domain.PdfParserAnnotate
 import ru.usb.pdf.pdfviewer.domain.toViewerLinks
 import ru.usb.pdf.pdfviewer.presentation.FilePdfSource
 import ru.usb.pdf.pdfviewer.presentation.PdfScrollMode
@@ -60,25 +60,54 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun PdfScreen() {
+        var assetFileName by remember { mutableStateOf("") }
+        if (assetFileName.isBlank()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .safeDrawingPadding()
+            ) {
+                listOf(
+                    "agreement.pdf",
+                    "corrupt_links.pdf",
+                    "dep_dohod_010426_r4mvie3j.pdf",
+                    "dep_kluchevoy_plus_230326_noqsifxj.pdf",
+                    "dep_komfort_plus_230326_9xl8rxss.pdf",
+                    "dep_vigodny_010426_hvxyyzey.pdf",
+                    "pdf_link_types_demo.pdf"
+                ).forEach {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        modifier = Modifier.clickable {
+                            assetFileName = it
+                        },
+                        text = it
+                    )
+                }
+            }
+
+            return
+        }
+
         var state by remember { mutableStateOf<PdfViewerLoadingState>(PdfViewerLoadingState.Loading) }
 
-        val uri = getOrCopyAssetToCache(this, "corrupt_links.pdf")
+        val uri = getOrCopyAssetToCache(this, assetFileName)
         LaunchedEffect(uri) {
             val pdfBytes =
-                PdfLoader.loadFromAssets(this@MainActivity, "corrupt_links.pdf")
+                PdfLoader.loadFromAssets(this@MainActivity, assetFileName)
 
-            val links = PdfLinkExtractor()
-                .extract(pdfBytes)
-                .toViewerLinks() +
-                    PdfLinkExtractorAnnotate()
+            val links =
+//                PdfLinkExtractor()
+//                .extract(pdfBytes)
+//                .toViewerLinks() +
+                PdfParserAnnotate()
                         .extract(pdfBytes)
                         .toViewerLinks()
 
             links.forEach {
                 println("$it")
             }
-
-            delay(2000)
 
             state = PdfViewerLoadingState.Ready(FilePdfSource(uri), links)
         }
