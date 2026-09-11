@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ru.usb.pdf.pdfviewer.presentation
 
 import androidx.compose.foundation.layout.BoxScope
@@ -11,6 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import okio.IOException
+import ru.bankuralsib.mb.core.domain.exception.ErrorReport
+import ru.bankuralsib.mb.core.domain.model.Team
 import ru.usb.pdf.pdfviewer.domain.PdfLink
 
 // PdfViewer.kt
@@ -81,11 +86,20 @@ fun PdfViewer(
         renderer?.close()
         memoryManager.clear()
 
-        val openedPdf = source.open(context)
-        val newRenderer = PdfDocumentRenderer(openedPdf)
+        try {
+            source.open(context)?.let {
+                val newRenderer = PdfDocumentRenderer(it)
 
-        renderer = newRenderer
-        pageCount = newRenderer.pageCount
+                renderer = newRenderer
+                pageCount = newRenderer.pageCount
+            }
+        } catch (ex: IOException) {
+            ErrorReport.recordNonFatal(
+                throwable = ex,
+                message = "UCM-67140 currupted file",
+                team = Team.Sales
+            )
+        }
     }
 
     DisposableEffect(Unit) {

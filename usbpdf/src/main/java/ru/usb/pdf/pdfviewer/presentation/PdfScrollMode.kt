@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ru.usb.pdf.pdfviewer.presentation
 
 import androidx.compose.ui.Modifier

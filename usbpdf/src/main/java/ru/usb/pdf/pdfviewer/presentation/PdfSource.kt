@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ru.usb.pdf.pdfviewer.presentation
 
 import android.content.Context
@@ -9,7 +11,7 @@ import java.io.File
 // PdfSource.kt
 
 interface PdfSource {
-    suspend fun open(context: Context): OpenedPdf
+    suspend fun open(context: Context): OpenedPdf?
 }
 
 class OpenedPdf(
@@ -23,33 +25,10 @@ class OpenedPdf(
     }
 }
 
-class AssetPdfSource(
-    private val assetName: String
-) : PdfSource {
-    override suspend fun open(context: Context): OpenedPdf =
-        withContext(Dispatchers.IO) {
-            val file = File.createTempFile("pdf_", ".pdf", context.cacheDir)
-
-            context.assets.open(assetName).use { input ->
-                file.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
-
-            OpenedPdf(
-                file = file,
-                descriptor = ParcelFileDescriptor.open(
-                    file,
-                    ParcelFileDescriptor.MODE_READ_ONLY
-                )
-            )
-        }
-}
-
 class ByteArrayPdfSource(
     private val bytes: ByteArray
 ) : PdfSource {
-    override suspend fun open(context: Context): OpenedPdf =
+    override suspend fun open(context: Context): OpenedPdf? =
         withContext(Dispatchers.IO) {
             val file = File.createTempFile("pdf_", ".pdf", context.cacheDir)
             file.writeBytes(bytes)
@@ -68,22 +47,21 @@ class FilePdfSource(
     private val path: String
 ) : PdfSource {
 
-    override suspend fun open(context: Context): OpenedPdf =
+    override suspend fun open(context: Context): OpenedPdf? =
         withContext(Dispatchers.IO) {
-
             val file = File(path)
 
-            require(file.exists()) {
-                "File does not exist: $path"
+            if (file.exists()) {
+                OpenedPdf(
+                    file = file,
+                    descriptor = ParcelFileDescriptor.open(
+                        file,
+                        ParcelFileDescriptor.MODE_READ_ONLY
+                    ),
+                    deleteOnClose = false
+                )
+            } else {
+                null
             }
-
-            OpenedPdf(
-                file = file,
-                descriptor = ParcelFileDescriptor.open(
-                    file,
-                    ParcelFileDescriptor.MODE_READ_ONLY
-                ),
-                deleteOnClose = false
-            )
         }
 }

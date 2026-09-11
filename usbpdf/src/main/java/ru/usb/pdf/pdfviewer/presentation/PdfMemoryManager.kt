@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ru.usb.pdf.pdfviewer.presentation
 
 import android.graphics.Bitmap
