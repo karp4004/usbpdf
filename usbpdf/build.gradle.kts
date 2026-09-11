@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     id("maven-publish")
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -22,6 +23,9 @@ android {
     buildFeatures {
         compose = true
     }
+    kotlinOptions {
+        jvmTarget = "21"
+    }
 
     publishing {
         singleVariant("release") {
@@ -31,7 +35,7 @@ android {
 }
 
 group = "ru.usb.pdf"
-version = "1.0.9"
+version = "1.0.10"
 
 afterEvaluate {
     publishing {
@@ -41,7 +45,7 @@ afterEvaluate {
 
                 groupId = "ru.usb.pdf"
                 artifactId = "pdfviewer"
-                version = "1.0.9"
+                version = "1.0.10"
             }
         }
     }
@@ -50,6 +54,7 @@ afterEvaluate {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.core.ktx)
     implementation(libs.material)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
