@@ -4,8 +4,8 @@ package ru.usb.pdf.pdfviewer.presentation
 
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
-import ru.bankuralsib.mb.core.domain.exception.ErrorReport
-import ru.bankuralsib.mb.core.domain.model.Team
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filterNotNull
 import ru.usb.pdf.pdfviewer.domain.PdfPageSize
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -13,6 +13,21 @@ import kotlin.math.sqrt
 class PdfDocumentRenderer(
     private val openedPdf: OpenedPdf
 ) : AutoCloseable {
+
+    data class PdfError(
+        val t: Throwable,
+        val context: ErrorContext
+    ) {
+        enum class ErrorContext {
+            OPEN_PAGE,
+            CLOSE_PAGE,
+            GET_PAGE_SIZE
+        }
+    }
+
+    private val _errorFlow = MutableSharedFlow<PdfError?>(1)
+    val errorFlow = _errorFlow.filterNotNull()
+    fun emitError(t: PdfError) = _errorFlow.tryEmit(t)
 
     private companion object {
         /**
@@ -148,11 +163,7 @@ class PdfDocumentRenderer(
             renderer.close()
             openedPdf.close()
         } catch (t: Throwable) {
-            ErrorReport.recordNonFatal(
-                throwable = t,
-                message = "UCM-67140 Current page not closed",
-                team = Team.Sales
-            )
+            emitError(PdfError(t, PdfError.ErrorContext.CLOSE_PAGE))
         }
     }
 }

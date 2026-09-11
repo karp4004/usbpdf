@@ -3,6 +3,7 @@ package com.example.mypdf
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,8 +36,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mypdf.ui.theme.MyPdfTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractor
+import ru.usb.pdf.pdfviewer.domain.PdfLinkExtractorAnnotate
 import ru.usb.pdf.pdfviewer.domain.PdfLoader
-import ru.usb.pdf.pdfviewer.domain.PdfParserAnnotate
 import ru.usb.pdf.pdfviewer.domain.toViewerLinks
 import ru.usb.pdf.pdfviewer.presentation.FilePdfSource
 import ru.usb.pdf.pdfviewer.presentation.PdfScrollMode
@@ -94,16 +98,17 @@ class MainActivity : ComponentActivity() {
 
         val uri = getOrCopyAssetToCache(this, assetFileName)
         LaunchedEffect(uri) {
-            val pdfBytes =
-                PdfLoader.loadFromAssets(this@MainActivity, assetFileName)
+            val links = withContext(Dispatchers.IO) {
+                val pdfBytes =
+                    PdfLoader.loadFromAssets(this@MainActivity, assetFileName)
 
-            val links =
-//                PdfLinkExtractor()
-//                .extract(pdfBytes)
-//                .toViewerLinks() +
-                PdfParserAnnotate()
-                        .extract(pdfBytes)
-                        .toViewerLinks()
+                PdfLinkExtractor()
+                    .extract(pdfBytes)
+                    .toViewerLinks() +
+                        PdfLinkExtractorAnnotate()
+                            .extract(pdfBytes)
+                            .toViewerLinks()
+            }
 
             links.forEach {
                 println("$it")
@@ -141,6 +146,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.background(Color.Transparent),
                     onLinkClick = { link ->
                         Log.d("PDF_LINK", "clicked ${link.uri}")
+                        Toast.makeText(
+                            baseContext,
+                            link.uri,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     },
                     decorator = { currentPage, pageCount ->
                         PageIndicator(currentPage, pageCount)

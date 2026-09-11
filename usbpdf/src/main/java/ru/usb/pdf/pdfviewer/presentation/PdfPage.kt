@@ -24,11 +24,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.bankuralsib.mb.core.domain.exception.ErrorReport
-import ru.bankuralsib.mb.core.domain.model.Team
 import ru.usb.pdf.pdfviewer.domain.PdfLink
 import ru.usb.pdf.pdfviewer.domain.PdfPageSize
 import ru.usb.pdf.pdfviewer.domain.PdfRect
+import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfError
 import kotlin.math.roundToInt
 
 @Composable
@@ -126,10 +125,8 @@ fun PdfPage(
                 try {
                     renderer.getPageSize(pageIndex)
                 } catch (ex: Throwable) {
-                    ErrorReport.recordNonFatal(
-                        throwable = ex,
-                        message = "UCM-67140 PdfDocumentRenderer.getPageSize PdfDocumentProxy cannot be null",
-                        team = Team.Sales
+                    renderer.emitError(
+                        PdfError(ex, PdfError.ErrorContext.GET_PAGE_SIZE)
                     )
 
                     null

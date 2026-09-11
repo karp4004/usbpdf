@@ -13,10 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import okio.IOException
-import ru.bankuralsib.mb.core.domain.exception.ErrorReport
-import ru.bankuralsib.mb.core.domain.model.Team
 import ru.usb.pdf.pdfviewer.domain.PdfLink
+import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfError
+import java.io.IOException
 
 // PdfViewer.kt
 
@@ -94,11 +93,7 @@ fun PdfViewer(
                 pageCount = newRenderer.pageCount
             }
         } catch (ex: IOException) {
-            ErrorReport.recordNonFatal(
-                throwable = ex,
-                message = "UCM-67140 currupted file",
-                team = Team.Sales
-            )
+            renderer?.emitError(PdfError(ex, PdfError.ErrorContext.OPEN_PAGE))
         }
     }
 
