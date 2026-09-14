@@ -13,38 +13,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import ru.usb.pdf.pdfviewer.domain.PdfLink
 import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfError
 import java.io.IOException
 
 // PdfViewer.kt
 
-sealed interface PdfViewerLoadingState {
-    data object Loading : PdfViewerLoadingState
+sealed interface UsbPdfState {
+    data object Loading : UsbPdfState
     data class Ready(
         val source: PdfSource,
         val links: List<PdfLink>
-    ) : PdfViewerLoadingState
+    ) : UsbPdfState
 
-    data class Error(val throwable: Throwable) : PdfViewerLoadingState
+    data class Error(val throwable: Throwable) : UsbPdfState
 }
 
 @Composable
 fun BoxScope.PdfViewer(
     modifier: Modifier = Modifier,
-    state: PdfViewerLoadingState,
+    state: UsbPdfState,
     scrollMode: PdfScrollMode = PdfScrollMode.Vertical,
     minScale: Float = 1f,
     maxScale: Float = 4f,
     onLinkClick: (PdfLink) -> Unit = {},
     decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit,
     loading: @Composable BoxScope.() -> Unit,
-    error: @Composable BoxScope.() -> Unit
+    error: @Composable BoxScope.() -> Unit,
+    systemErrors: (t: Throwable) -> Unit
 ) {
     when (state) {
-        is PdfViewerLoadingState.Loading -> loading()
-        is PdfViewerLoadingState.Error -> error()
-        is PdfViewerLoadingState.Ready -> PdfViewer(
+        is UsbPdfState.Loading -> loading()
+        is UsbPdfState.Error -> error()
+        is UsbPdfState.Ready -> PdfViewer(
             modifier,
             state.source,
             state.links,
@@ -52,7 +55,8 @@ fun BoxScope.PdfViewer(
             minScale,
             maxScale,
             onLinkClick,
-            decorator
+            decorator,
+            systemErrors
         )
     }
 }
@@ -66,7 +70,8 @@ fun PdfViewer(
     minScale: Float = 1f,
     maxScale: Float = 4f,
     onLinkClick: (PdfLink) -> Unit = {},
-    decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit
+    decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit,
+    systemErrors: (t: Throwable) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -79,6 +84,13 @@ fun PdfViewer(
 
     val linksByPage = remember(links) {
         links.groupBy { it.page }
+    }
+
+    LaunchedEffect(Unit) {
+        renderer
+            ?.errorFlow
+            ?.onEach { systemErrors(it.t) }
+            ?.collect()
     }
 
     LaunchedEffect(source) {

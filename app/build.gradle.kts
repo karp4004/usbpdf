@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-    implementation("com.github.karp4004:usbpdf:1.0.10")
+    implementation("com.github.karp4004:usbpdf:1.0.11")
 //    implementation(project(":usbpdf"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

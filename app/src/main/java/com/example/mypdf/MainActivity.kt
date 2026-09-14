@@ -163,6 +163,13 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.align(Alignment.Center),
                             text = "Error"
                         )
+                    },
+                    systemErrors = {
+                        Toast.makeText(
+                            baseContext,
+                            it,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 )
             }
