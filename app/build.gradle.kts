@@ -41,8 +41,8 @@ android {
 }
 
 dependencies {
-//    implementation(libs.usbpdf)
-    implementation(project(":usbpdf"))
+    implementation(libs.usbpdf)
+//    implementation(project(":usbpdf"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
