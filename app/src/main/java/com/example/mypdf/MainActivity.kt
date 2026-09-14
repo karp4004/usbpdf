@@ -45,7 +45,7 @@ import ru.usb.pdf.pdfviewer.domain.toViewerLinks
 import ru.usb.pdf.pdfviewer.presentation.FilePdfSource
 import ru.usb.pdf.pdfviewer.presentation.PdfScrollMode
 import ru.usb.pdf.pdfviewer.presentation.PdfViewer
-import ru.usb.pdf.pdfviewer.presentation.PdfViewerLoadingState
+import ru.usb.pdf.pdfviewer.presentation.UsbPdfState
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        var state by remember { mutableStateOf<PdfViewerLoadingState>(PdfViewerLoadingState.Loading) }
+        var state by remember { mutableStateOf<UsbPdfState>(UsbPdfState.Loading) }
 
         val uri = getOrCopyAssetToCache(this, assetFileName)
         LaunchedEffect(uri) {
@@ -114,7 +114,7 @@ class MainActivity : ComponentActivity() {
                 println("$it")
             }
 
-            state = PdfViewerLoadingState.Ready(FilePdfSource(uri), links)
+            state = UsbPdfState.Ready(FilePdfSource(uri), links)
         }
 
 
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                     systemErrors = {
                         Toast.makeText(
                             baseContext,
-                            it,
+                            it.t.localizedMessage,
                             Toast.LENGTH_SHORT
                         ).show()
                     }

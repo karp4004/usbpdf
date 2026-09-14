@@ -14,7 +14,7 @@ class PdfDocumentRenderer(
     private val openedPdf: OpenedPdf
 ) : AutoCloseable {
 
-    data class PdfError(
+    data class PdfSystemError(
         val t: Throwable,
         val context: ErrorContext
     ) {
@@ -25,9 +25,9 @@ class PdfDocumentRenderer(
         }
     }
 
-    private val _errorFlow = MutableSharedFlow<PdfError?>(1)
+    private val _errorFlow = MutableSharedFlow<PdfSystemError?>(1)
     val errorFlow = _errorFlow.filterNotNull()
-    fun emitError(t: PdfError) = _errorFlow.tryEmit(t)
+    fun emitError(t: PdfSystemError) = _errorFlow.tryEmit(t)
 
     private companion object {
         /**
@@ -163,7 +163,7 @@ class PdfDocumentRenderer(
             renderer.close()
             openedPdf.close()
         } catch (t: Throwable) {
-            emitError(PdfError(t, PdfError.ErrorContext.CLOSE_PAGE))
+            emitError(PdfSystemError(t, PdfSystemError.ErrorContext.CLOSE_PAGE))
         }
     }
 }

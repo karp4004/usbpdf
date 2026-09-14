@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 import ru.usb.pdf.pdfviewer.domain.PdfLink
 import ru.usb.pdf.pdfviewer.domain.PdfPageSize
 import ru.usb.pdf.pdfviewer.domain.PdfRect
-import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfError
+import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfSystemError
 import kotlin.math.roundToInt
 
 @Composable
@@ -126,7 +126,7 @@ fun PdfPage(
                     renderer.getPageSize(pageIndex)
                 } catch (ex: Throwable) {
                     renderer.emitError(
-                        PdfError(ex, PdfError.ErrorContext.GET_PAGE_SIZE)
+                        PdfSystemError(ex, PdfSystemError.ErrorContext.GET_PAGE_SIZE)
                     )
 
                     null

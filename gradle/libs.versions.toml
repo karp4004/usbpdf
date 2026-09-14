@@ -8,6 +8,7 @@ composeBom = "2025.12.01"
 appcompat = "1.7.1"
 material = "1.13.0"
 coreKtxVersion = "1.17.0"
+usbpdf = "1.0.12"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -21,6 +22,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtxVersion" }
+usbpdf = { module = "com.github.karp4004:usbpdf", version.ref = "usbpdf" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

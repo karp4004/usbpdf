@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import ru.usb.pdf.pdfviewer.domain.PdfLink
-import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfError
+import ru.usb.pdf.pdfviewer.presentation.PdfDocumentRenderer.PdfSystemError
 import java.io.IOException
 
 // PdfViewer.kt
@@ -42,7 +42,7 @@ fun BoxScope.PdfViewer(
     decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit,
     loading: @Composable BoxScope.() -> Unit,
     error: @Composable BoxScope.() -> Unit,
-    systemErrors: (t: Throwable) -> Unit
+    systemErrors: (e: PdfSystemError) -> Unit
 ) {
     when (state) {
         is UsbPdfState.Loading -> loading()
@@ -71,7 +71,7 @@ fun PdfViewer(
     maxScale: Float = 4f,
     onLinkClick: (PdfLink) -> Unit = {},
     decorator: @Composable BoxScope.(currentPage: Int, pageCount: Int) -> Unit,
-    systemErrors: (t: Throwable) -> Unit
+    systemErrors: (e: PdfSystemError) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -89,7 +89,7 @@ fun PdfViewer(
     LaunchedEffect(Unit) {
         renderer
             ?.errorFlow
-            ?.onEach { systemErrors(it.t) }
+            ?.onEach { systemErrors(it) }
             ?.collect()
     }
 
@@ -105,7 +105,7 @@ fun PdfViewer(
                 pageCount = newRenderer.pageCount
             }
         } catch (ex: IOException) {
-            renderer?.emitError(PdfError(ex, PdfError.ErrorContext.OPEN_PAGE))
+            renderer?.emitError(PdfSystemError(ex, PdfSystemError.ErrorContext.OPEN_PAGE))
         }
     }
 
