@@ -86,10 +86,12 @@ fun PdfViewer(
         links.groupBy { it.page }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(renderer) {
         renderer
             ?.errorFlow
-            ?.onEach { systemErrors(it) }
+            ?.onEach {
+                systemErrors(it)
+            }
             ?.collect()
     }
 
@@ -105,7 +107,7 @@ fun PdfViewer(
                 pageCount = newRenderer.pageCount
             }
         } catch (ex: IOException) {
-            renderer?.emitError(PdfSystemError(ex, PdfSystemError.ErrorContext.OPEN_PAGE))
+            systemErrors(PdfSystemError(ex, PdfSystemError.ErrorContext.OPEN_PAGE))
         }
     }
 

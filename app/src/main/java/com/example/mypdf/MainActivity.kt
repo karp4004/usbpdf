@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -65,6 +66,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun PdfScreen() {
         var assetFileName by remember { mutableStateOf("") }
+
+        BackHandler(assetFileName.isNotBlank()) { assetFileName = "" }
+
         if (assetFileName.isBlank()) {
             Column(
                 modifier = Modifier
